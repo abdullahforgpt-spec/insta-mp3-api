@@ -15,8 +15,8 @@ app.get('/api/extract', async (req, res) => {
     }
 
     try {
-        // Updated to use the active production processing endpoint
-        const cobaltResponse = await fetch('https://api.cobalt.tools/api/json', {
+        // Direct integration with an open infrastructure route bypass
+        const response = await fetch('https://cobalt.api.v0.sh/api/json', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -24,23 +24,24 @@ app.get('/api/extract', async (req, res) => {
             },
             body: JSON.stringify({
                 url: url,
-                downloadMode: 'audio', 
-                audioFormat: 'mp3',    
-                filenameStyle: 'basic'
+                downloadMode: 'audio',
+                audioFormat: 'mp3'
             })
         });
 
-        const data = await cobaltResponse.json();
+        const data = await response.json();
 
         if (data && data.url) {
             return res.json({ success: true, mp3_link: data.url });
+        } else if (data && data.text) {
+            return res.status(500).json({ success: false, error: data.text });
         } else {
-            return res.status(500).json({ success: false, error: data.text || 'The extraction engine node rejected this request.' });
+            return res.status(500).json({ success: false, error: 'Media streamline token could not be fetched.' });
         }
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, error: 'Internal pipeline connectivity issue.' });
+        return res.status(500).json({ success: false, error: 'Server connectivity route failed.' });
     }
 });
 
