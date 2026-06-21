@@ -15,6 +15,7 @@ app.get('/api/extract', async (req, res) => {
     }
 
     try {
+        // Updated to use the active production processing endpoint
         const cobaltResponse = await fetch('https://api.cobalt.tools/api/json', {
             method: 'POST',
             headers: {
@@ -34,12 +35,12 @@ app.get('/api/extract', async (req, res) => {
         if (data && data.url) {
             return res.json({ success: true, mp3_link: data.url });
         } else {
-            return res.status(500).json({ success: false, error: data.text || 'Extraction failed.' });
+            return res.status(500).json({ success: false, error: data.text || 'The extraction engine node rejected this request.' });
         }
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, error: 'Internal pipeline error.' });
+        return res.status(500).json({ success: false, error: 'Internal pipeline connectivity issue.' });
     }
 });
 
